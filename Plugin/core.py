@@ -1,8 +1,9 @@
 import inspect
 import json
 import os
-import sqlite3, time
+import sqlite3
 import sys
+import time
 import webbrowser
 from logging import getLogger
 from typing import Any
@@ -76,32 +77,31 @@ class FirefoxKeywordBookmarks:
     def settings(self) -> dict:
         return self.rpc_request["settings"]
 
-    def get_bookmark(self, query: str, profile_path: str) -> list[Option]:
-        opts = []
+    def get_bookmarks(self, profile_path: str) -> dict[str, dict]:
+        final = {}
 
         with sqlite3.connect(os.path.join(profile_path, "places.sqlite")) as con:
-            keyword_data = con.execute(
-                "SELECT * FROM moz_keywords WHERE keyword = ?", (query,)
-            ).fetchone()
-            LOG.debug(f"{keyword_data=}")
-            if keyword_data:
-                place_id = keyword_data[2]
-                keyword = keyword_data[1]
-                place = con.execute(
-                    "SELECT * FROM moz_places WHERE id = ?", (place_id,)
-                ).fetchone()
-                if place:
-                    url = place[1]
-                    opts.append(
-                        Option(
+            rows = con.execute(
+                "SELECT * FROM moz_keywords",
+            ).fetchall()
+            for keyword_data in rows:
+                LOG.debug(f"{keyword_data=}")
+                if keyword_data:
+                    place_id = keyword_data[2]
+                    keyword = keyword_data[1]
+                    place = con.execute(
+                        "SELECT * FROM moz_places WHERE id = ?", (place_id,)
+                    ).fetchone()
+                    if place:
+                        url = place[1]
+                        final[keyword] = Option(
                             title=keyword,
                             sub=url,
                             callback="open_url",
                             params=[url],
                             score=100,
-                        )
-                    )
-        return opts
+                        ).to_jsonrpc()
+        return final
 
     def query(self, query: str):
         LOG.info(f"Received query: {query!r}")
@@ -133,8 +133,20 @@ class FirefoxKeywordBookmarks:
             ]
 
         if query.startswith(":"):
-            LOG.info("Heading to get bookmark method")
-            return self.get_bookmark(query, profile_path)
+            if not os.path.exists("cache.json") or query == ":!RELOAD-FKB":
+                LOG.info("Reloading")
+                cache = self.get_bookmarks(profile_path)
+                with open("cache.json", "w", encoding="UTF-8") as f:
+                    json.dump(cache, f)
+                LOG.info(f"Finished reloading cache. New Cache: {cache!r}")
+                return [Option(title="Finished Reloading Bookmark Cache", score=100)]
+            else:
+                with open("cache.json", "r", encoding="UTF-8") as f:
+                    cache: dict[str, dict] = json.load(f)
+                LOG.info(f"Got cache, cache: {cache!r}")
+            opt = cache.get(query)
+            if opt:
+                return [opt]
         return []
 
     def context_menu(self, data: list[Any]):

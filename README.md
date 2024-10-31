@@ -17,3 +17,6 @@ Start typing the keyword in the flow launcher menu, and after some time, it will
 3. Copy the root path.
 ![](Images/find_path_example.png)
 4. Paste it into the settings menu
+
+## Cache
+If enabled, FirefoxKeywordBookmarks will grab all of your bookmarks, and put them in a cache file for easy and faster access (the cache system is about 2x the speed). To reload the cache, use the `:!RELOAD_FKB` command.

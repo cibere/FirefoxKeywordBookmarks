@@ -3,3 +3,4 @@ venv/*
 lib/*
 *.logs
 *.pyc
+cache.json

@@ -4,3 +4,9 @@ body:
       name: profile_path
       label: Profile Data Path
       description: The root path for the profile that you want to use from `about:profiles`.
+  - type: checkbox
+    attributes:
+      name: use_cache
+      label: Use Cache System
+      description: If checked, FirefoxKeywordBookmarks will grab all of your bookmarks, and put them in a cache file for easy and faster access (the cache system is about 2x the speed). To reload the cache, use the `:!RELOAD_FKB` command.
+      defaultValue: True
