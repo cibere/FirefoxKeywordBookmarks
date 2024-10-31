@@ -3,4 +3,4 @@ body:
     attributes:
       name: profile_path
       label: Profile Data Path
-      description: ...
+      description: The root path for the profile that you want to use from `about:profiles`.
