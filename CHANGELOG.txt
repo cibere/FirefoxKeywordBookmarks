@@ -1,1 +1,2 @@
 # v0.0.1
+- Add ability to search for firefox bookmarks by keyword
