@@ -6,12 +6,14 @@ import sys
 import webbrowser
 from logging import getLogger
 from typing import Any
+
 from .dataclass import Dataclass
 from .errors import BasePluginException, InternalException
 from .http import HTTPClient
 from .options import Option
 
 LOG = getLogger(__name__)
+
 
 class FirefoxKeywordBookmarks:
     def __init__(self, args: str | None = None):
@@ -78,12 +80,16 @@ class FirefoxKeywordBookmarks:
         opts = []
 
         with sqlite3.connect(os.path.join(profile_path, "places.sqlite")) as con:
-            keyword_data = con.execute("SELECT * FROM moz_keywords WHERE keyword = ?", (query,)).fetchone()
+            keyword_data = con.execute(
+                "SELECT * FROM moz_keywords WHERE keyword = ?", (query,)
+            ).fetchone()
             LOG.debug(f"{keyword_data=}")
             if keyword_data:
                 place_id = keyword_data[2]
                 keyword = keyword_data[1]
-                place = con.execute("SELECT * FROM moz_places WHERE id = ?", (place_id,)).fetchone()
+                place = con.execute(
+                    "SELECT * FROM moz_places WHERE id = ?", (place_id,)
+                ).fetchone()
                 if place:
                     url = place[1]
                     opts.append(
@@ -91,23 +97,45 @@ class FirefoxKeywordBookmarks:
                             title=keyword,
                             sub=url,
                             callback="open_url",
-                            params=[url]
+                            params=[url],
+                            score=100,
                         )
                     )
         return opts
 
     def query(self, query: str):
         LOG.info(f"Received query: {query!r}")
-        
-        profile_path = (self.settings['profile_path'] or "").strip().strip('"')
+
+        profile_path = (self.settings["profile_path"] or "").strip().strip('"')
         if not profile_path:
-            return [Option(title="Error: No profile data path given", callback="open_settings_menu", sub="Click to open settings menu")]
+            return [
+                Option(
+                    title="Error: No profile data path given",
+                    sub="Open context menu for more options",
+                    context_data=[
+                        Option(
+                            title="Open Settings Menu", callback="open_settings_menu"
+                        ),
+                        Option(
+                            title="Open Guide",
+                            callback="open_url",
+                            params=[
+                                "https://github.com/cibere/Flow.Launcher.Plugin.FirefoxKeywordBookmarks?tab=readme-ov-file#how-to-get-profile-data-path"
+                            ],
+                        ),
+                        Option(
+                            title="Open Profiles",
+                            callback="open_url",
+                            params=["about:profiles"],
+                        ),
+                    ],
+                )
+            ]
 
         if query.startswith(":"):
             LOG.info("Heading to get bookmark method")
             return self.get_bookmark(query, profile_path)
         return []
-
 
     def context_menu(self, data: list[Any]):
         LOG.debug(f"Context menu received: {data=}")
@@ -117,7 +145,9 @@ class FirefoxKeywordBookmarks:
         webbrowser.open(url)
 
     def open_settings_menu(self):
-        print(json.dumps({"method": "Flow.Launcher.OpenSettingDialog", "parameters": []}))
+        print(
+            json.dumps({"method": "Flow.Launcher.OpenSettingDialog", "parameters": []})
+        )
 
     def open_log_file_folder(self):
         os.system(f'explorer.exe /select, "FirefoxKeywordBookmarks.logs"')
