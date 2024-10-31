@@ -1,7 +1,7 @@
 import inspect
 import json
 import os
-import sqlite3
+import sqlite3, time
 import sys
 import webbrowser
 from logging import getLogger
@@ -18,6 +18,7 @@ class FirefoxKeywordBookmarks:
     def __init__(self, args: str | None = None):
         # defalut jsonrpc
         self.rpc_request = {"method": "query", "parameters": [""]}
+        start_time = time.perf_counter()
 
         if args is None and len(sys.argv) > 1:
 
@@ -68,6 +69,8 @@ class FirefoxKeywordBookmarks:
             print(payload)
         else:
             request_method(*request_parameters)
+        end_time = time.perf_counter()
+        LOG.info(f"Finished in {(end_time - start_time)*1000}ms")
 
     @property
     def settings(self) -> dict:
