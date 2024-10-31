@@ -39,10 +39,12 @@ class InternalException(BasePluginException):
         opts = [
             Option(
                 score=100,
-                icon="error",
                 title="An internal error has occured.",
                 sub="Open the context menu for more information",
                 context_data=[
+                    Option(
+                        score=100, title="An internal error has occured.", icon="error"
+                    ),
                     Option(
                         score=80,
                         icon="github",

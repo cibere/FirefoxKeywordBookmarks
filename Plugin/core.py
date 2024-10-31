@@ -162,4 +162,6 @@ class FirefoxKeywordBookmarks:
         )
 
     def open_log_file_folder(self):
-        os.system(f'explorer.exe /select, "FirefoxKeywordBookmarks.logs"')
+        log_fp = os.path.join(os.getcwd(), "FirefoxKeywordBookmarks.log")
+        LOG.info(f"Log File: {log_fp}")
+        os.system(f'explorer.exe /select, "{log_fp}"')
