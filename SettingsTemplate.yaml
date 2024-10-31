@@ -1,0 +1,6 @@
+body:
+  - type: input
+    attributes:
+      name: profile_path
+      label: Profile Data Path
+      description: ...
