@@ -9,7 +9,6 @@ from typing import Any
 
 from .dataclass import Dataclass
 from .errors import BasePluginException, InternalException
-from .http import HTTPClient
 from .options import Option
 
 LOG = getLogger(__name__)
@@ -17,8 +16,6 @@ LOG = getLogger(__name__)
 
 class FirefoxKeywordBookmarks:
     def __init__(self, args: str | None = None):
-        self.http = HTTPClient(self)
-
         # defalut jsonrpc
         self.rpc_request = {"method": "query", "parameters": [""]}
 
