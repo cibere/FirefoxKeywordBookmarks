@@ -6,7 +6,7 @@ A plugin for flow launcher that lets you open firefox bookmarks from their keywo
 Set the score value for the plugin to 10 or something similiar, so it is at the top of the results.
 
 ## Useage
-Start typing the keyword in the flow launcher menu, and after some time, it will appear (make sure to include the `:`).
+Start typing the keyword in the flow launcher menu, and after some time, it will appear.
 > [!NOTE]
 > The current code is unfortunately fairly slow, but that is mainly due to this plugin being written in python, and using V1 of the plugin API. I am working with one of the developers of Flow Launcher to hopefully start using V2 of the plugin API, but this will have to do until then.
 ![Example Image](Images/example.png)
