@@ -132,21 +132,20 @@ class FirefoxKeywordBookmarks:
                 )
             ]
 
-        if query.startswith(":"):
-            if not os.path.exists("cache.json") or query == ":!RELOAD-FKB":
-                LOG.info("Reloading")
-                cache = self.get_bookmarks(profile_path)
-                with open("cache.json", "w", encoding="UTF-8") as f:
-                    json.dump(cache, f)
-                LOG.info(f"Finished reloading cache. New Cache: {cache!r}")
-                return [Option(title="Finished Reloading Bookmark Cache", score=100)]
-            else:
-                with open("cache.json", "r", encoding="UTF-8") as f:
-                    cache: dict[str, dict] = json.load(f)
-                LOG.info(f"Got cache, cache: {cache!r}")
-            opt = cache.get(query)
-            if opt:
-                return [opt]
+        if not os.path.exists("cache.json") or query == ":!RELOAD-FKB":
+            LOG.info("Reloading")
+            cache = self.get_bookmarks(profile_path)
+            with open("cache.json", "w", encoding="UTF-8") as f:
+                json.dump(cache, f)
+            LOG.info(f"Finished reloading cache. New Cache: {cache!r}")
+            return [Option(title="Finished Reloading Bookmark Cache", score=100)]
+        else:
+            with open("cache.json", "r", encoding="UTF-8") as f:
+                cache: dict[str, dict] = json.load(f)
+            LOG.info(f"Got cache, cache: {cache!r}")
+        opt = cache.get(query)
+        if opt:
+            return [opt]
         return []
 
     def context_menu(self, data: list[Any]):
