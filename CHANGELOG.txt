@@ -1,3 +1,2 @@
-# v0.0.2
-- Add an optional cache feature which is 2x the speed of full lookups.
-- Update error handling
+# v0.0.3
+- Fix keywords that don't start with a colon not working
