@@ -1,6 +1,7 @@
+import asyncio
 import os
 import sqlite3
-import time, asyncio
+import time
 from logging import getLogger
 from typing import Any
 
@@ -13,7 +14,9 @@ from flowpy import (
     QueryResponse,
     Settings,
 )
+
 LOG = getLogger("plugin")
+
 
 class FirefoxKeywordBookmarks(Plugin):
     def __init__(self) -> None:
@@ -47,7 +50,7 @@ class FirefoxKeywordBookmarks(Plugin):
                         final[keyword] = Option(
                             title=keyword,
                             sub=url,
-                            action=Action(self.open_url, firefox_fp,profile_path, url),
+                            action=Action(self.open_url, firefox_fp, profile_path, url),
                             context_data=[profile_path, firefox_fp, []],
                             icon="Images/app.png",
                         )
@@ -112,7 +115,12 @@ class FirefoxKeywordBookmarks(Plugin):
                     icon="Images/app.png",
                     action=Action(self.reload_cache, profile_path, firefox_fp),
                 ),
-                Option("Open log file", icon="Images/app.png",sub="Open FirefoxKeywordBookmarks.log in explorer", action=Action(self.open_log_file_folder)),
+                Option(
+                    "Open log file",
+                    icon="Images/app.png",
+                    sub="Open FirefoxKeywordBookmarks.log in explorer",
+                    action=Action(self.open_log_file_folder),
+                ),
             ]
         )
 
@@ -133,13 +141,16 @@ class FirefoxKeywordBookmarks(Plugin):
         )
         return ExecuteResponse(False)
 
-    async def open_url(self, firefox_fp: str | None, profile_path: str | None, url: str) -> ExecuteResponse:
+    async def open_url(
+        self, firefox_fp: str | None, profile_path: str | None, url: str
+    ) -> ExecuteResponse:
         if firefox_fp is None:
             await self.api.open_url(url)
         else:
-            cmd = f'cd "{firefox_fp}" && "firefox.exe" "{url}" -profile "{profile_path}"'
+            cmd = (
+                f'cd "{firefox_fp}" && "firefox.exe" "{url}" -profile "{profile_path}"'
+            )
             LOG.debug(f"Running shell command: {cmd!r}")
             data = await self.api.run_shell_cmd(cmd)
             LOG.info(f"{data.data!r}")
         return ExecuteResponse()
-
