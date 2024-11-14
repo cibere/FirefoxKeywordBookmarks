@@ -4,6 +4,7 @@ import time
 from logging import getLogger
 from typing import Any
 
+import pyperclip
 from flowpy import (
     Action,
     ExecuteResponse,
@@ -50,7 +51,11 @@ class FirefoxKeywordBookmarks(Plugin):
                             title=keyword,
                             sub=url,
                             action=Action(self.open_url, firefox_fp, profile_path, url),
-                            context_data=[profile_path, firefox_fp, []],
+                            context_data=[
+                                profile_path,
+                                firefox_fp,
+                                {"keyword": keyword, "url": url},
+                            ],
                             icon="Images/app.png",
                         )
         LOG.info(f"Returning bookmarks: {final!r}")
@@ -105,10 +110,20 @@ class FirefoxKeywordBookmarks(Plugin):
 
     async def context_menu(self, data: list[Any]):
         LOG.debug(f"Context menu received: {data=}")
-        profile_path, firefox_fp, options = data
+        profile_path, firefox_fp, copy_options = data
+        opts = []
+        if copy_options:
+            for name, value in copy_options.items():
+                opts.append(
+                    Option(
+                        f"Copy {name.title()}",
+                        value,
+                        "Images/app.png",
+                        action=Action(self.copy_text, value),
+                    )
+                )
         return QueryResponse(
-            options
-            + [
+            [
                 Option(
                     "Reload Cache",
                     icon="Images/app.png",
@@ -121,6 +136,7 @@ class FirefoxKeywordBookmarks(Plugin):
                     action=Action(self.open_log_file_folder),
                 ),
             ]
+            + opts
         )
 
     async def open_log_file_folder(self):
@@ -150,6 +166,14 @@ class FirefoxKeywordBookmarks(Plugin):
                 f'cd "{firefox_fp}" && "firefox.exe" "{url}" -profile "{profile_path}"'
             )
             LOG.debug(f"Running shell command: {cmd!r}")
-            data = await self.api.run_shell_cmd(cmd)
-            LOG.info(f"{data.data!r}")
+            await self.api.run_shell_cmd(cmd)
         return ExecuteResponse()
+
+    async def copy_text(self, text: str) -> ExecuteResponse:
+        pyperclip.copy(text)
+        await self.api.show_message(
+            "Firefox Keyword Bookmarks",
+            f"Successfully copied {text!r}",
+            icon="Images/app.png",
+        )
+        return ExecuteResponse(False)
