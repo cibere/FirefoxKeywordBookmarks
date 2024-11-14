@@ -1,84 +1,34 @@
-import inspect
-import json
 import os
 import sqlite3
-import sys
-import time
-import webbrowser
+import time, asyncio
 from logging import getLogger
 from typing import Any
 
-from .dataclass import Dataclass
-from .errors import BasePluginException, InternalException
-from .options import Option
+from flowpy import (
+    Action,
+    ExecuteResponse,
+    Option,
+    Plugin,
+    Query,
+    QueryResponse,
+    Settings,
+)
+LOG = getLogger("plugin")
 
-LOG = getLogger(__name__)
+class FirefoxKeywordBookmarks(Plugin):
+    def __init__(self) -> None:
+        self.cache: dict[str, Option] | None = None
+        super().__init__()
 
+    def get_bookmarks(self, profile_path: str, firefox_fp: str) -> dict[str, Option]:
+        LOG.info(f"Getting bookmarks for {profile_path}")
+        final: dict[str, Option] = {}
 
-class FirefoxKeywordBookmarks:
-    def __init__(self, args: str | None = None):
-        # defalut jsonrpc
-        self.rpc_request = {"method": "query", "parameters": [""]}
-        start_time = time.perf_counter()
-
-        if args is None and len(sys.argv) > 1:
-
-            # Gets JSON-RPC from Flow Launcher process.
-            self.rpc_request = json.loads(sys.argv[1])
-        LOG.debug(f"Received RPC request: {json.dumps(self.rpc_request)}")
-
-        # proxy is not working now
-        # self.proxy = self.rpc_request.get("proxy", {})
-
-        request_method_name = self.rpc_request.get("method", "query")
-        request_parameters = self.rpc_request.get("parameters", [])
-
-        methods = inspect.getmembers(self, predicate=inspect.ismethod)
-        request_method = dict(methods)[request_method_name]
-        if request_method_name in ("query", "context_menu"):
-            try:
-                raw_results = request_method(*request_parameters)
-            except BasePluginException as e:
-                raw_results = e.options
-            except Exception as e:
-                LOG.error(
-                    f"Error happened while running {request_method_name!r} method.",
-                    exc_info=e,
-                )
-                raw_results = InternalException().options
-            final_results = []
-
-            for result in raw_results:
-                if isinstance(result, Dataclass):
-                    result = result.to_option()
-                if isinstance(result, Option):
-                    result = result.to_jsonrpc()
-                if isinstance(result, dict):
-                    final_results.append(result)
-                else:
-                    LOG.error(
-                        f"Unknown result given: {result!r}",
-                        exc_info=RuntimeError(f"Unknown result given: {result!r}"),
-                    )
-                    final_results = InternalException().final_options()
-                    break
-
-            data = {"result": final_results}
-
-            payload = json.dumps(data)
-            LOG.debug(f"Sending data to flow: {payload}")
-            print(payload)
+        if profile_path[1] == "|":
+            prefix = profile_path[0]
+            profile_path = profile_path[2:]
         else:
-            request_method(*request_parameters)
-        end_time = time.perf_counter()
-        LOG.info(f"Finished in {(end_time - start_time)*1000}ms")
-
-    @property
-    def settings(self) -> dict:
-        return self.rpc_request["settings"]
-
-    def get_bookmarks(self, profile_path: str) -> dict[str, dict]:
-        final = {}
+            prefix = ""
 
         with sqlite3.connect(os.path.join(profile_path, "places.sqlite")) as con:
             rows = con.execute(
@@ -88,7 +38,7 @@ class FirefoxKeywordBookmarks:
                 LOG.debug(f"{keyword_data=}")
                 if keyword_data:
                     place_id = keyword_data[2]
-                    keyword = keyword_data[1]
+                    keyword = f"{prefix}{keyword_data[1]}"
                     place = con.execute(
                         "SELECT * FROM moz_places WHERE id = ?", (place_id,)
                     ).fetchone()
@@ -97,71 +47,99 @@ class FirefoxKeywordBookmarks:
                         final[keyword] = Option(
                             title=keyword,
                             sub=url,
-                            callback="open_url",
-                            params=[url],
-                            score=100,
-                        ).to_jsonrpc()
+                            action=Action(self.open_url, firefox_fp,profile_path, url),
+                            context_data=[profile_path, firefox_fp, []],
+                            icon="Images/app.png",
+                        )
+        LOG.info(f"Returning bookmarks: {final!r}")
         return final
 
-    def query(self, query: str):
+    async def __call__(self, data: Query, settings: Settings):
+        now = time.perf_counter()
+        query = data.text
         LOG.info(f"Received query: {query!r}")
 
-        profile_path = (self.settings["profile_path"] or "").strip().strip('"')
-        if not profile_path:
+        profile_path_data = settings.profile_path_data.strip().strip('"')
+        if not profile_path_data:
             return [
                 Option(
                     title="Error: No profile data path given",
                     sub="Open context menu for more options",
                     context_data=[
                         Option(
-                            title="Open Settings Menu", callback="open_settings_menu"
+                            title="Open Settings Menu",
+                            action=Action(self.api.open_settings_menu),
                         ),
                         Option(
                             title="Open Guide",
-                            callback="open_url",
-                            params=[
-                                "https://github.com/cibere/Flow.Launcher.Plugin.FirefoxKeywordBookmarks?tab=readme-ov-file#how-to-get-profile-data-path"
-                            ],
-                        ),
-                        Option(
-                            title="Open Profiles",
-                            callback="open_url",
-                            params=["about:profiles"],
+                            action=Action(
+                                self.api.open_url,
+                                "https://github.com/cibere/Flow.Launcher.Plugin.FirefoxKeywordBookmarks?tab=readme-ov-file#how-to-get-profile-data-path",
+                            ),
                         ),
                     ],
                 )
             ]
 
-        if query.startswith(":"):
-            if not os.path.exists("cache.json") or query == ":!RELOAD-FKB":
-                LOG.info("Reloading")
-                cache = self.get_bookmarks(profile_path)
-                with open("cache.json", "w", encoding="UTF-8") as f:
-                    json.dump(cache, f)
-                LOG.info(f"Finished reloading cache. New Cache: {cache!r}")
-                return [Option(title="Finished Reloading Bookmark Cache", score=100)]
-            else:
-                with open("cache.json", "r", encoding="UTF-8") as f:
-                    cache: dict[str, dict] = json.load(f)
-                LOG.info(f"Got cache, cache: {cache!r}")
-            opt = cache.get(query)
-            if opt:
-                return [opt]
+        if self.cache is None:
+            self.cache = {}
+            for path in profile_path_data.split("\\r\\n"):
+                try:
+                    self.cache.update(self.get_bookmarks(path, settings.firefox_fp))
+                except sqlite3.OperationalError:
+                    return [
+                        Option(
+                            f"Error: Unable to open profile database file. Profile: {path}",
+                            sub="Are you sure the profile exists and is correct? Click this to open settings menu.",
+                            action=Action(self.api.open_settings_menu),
+                        )
+                    ]
+            LOG.info(f"Cache has been reloaded. {self.cache!r}")
+        opt = self.cache.get(query)
+        LOG.info(f"Finished in {(time.perf_counter() - now)*1000}ms")
+        if opt:
+            return [opt]
         return []
 
-    def context_menu(self, data: list[Any]):
+    async def context_menu(self, data: list[Any]):
         LOG.debug(f"Context menu received: {data=}")
-        return data
-
-    def open_url(self, url):
-        webbrowser.open(url)
-
-    def open_settings_menu(self):
-        print(
-            json.dumps({"method": "Flow.Launcher.OpenSettingDialog", "parameters": []})
+        profile_path, firefox_fp, options = data
+        return QueryResponse(
+            options
+            + [
+                Option(
+                    "Reload Cache",
+                    icon="Images/app.png",
+                    action=Action(self.reload_cache, profile_path, firefox_fp),
+                ),
+                Option("Open log file", icon="Images/app.png",sub="Open FirefoxKeywordBookmarks.log in explorer", action=Action(self.open_log_file_folder)),
+            ]
         )
 
-    def open_log_file_folder(self):
-        log_fp = os.path.join(os.getcwd(), "FirefoxKeywordBookmarks.log")
+    async def open_log_file_folder(self):
+        log_fp = os.path.join(os.getcwd(), "FirefoxKeywordBookmarks.logs")
         LOG.info(f"Log File: {log_fp}")
-        os.system(f'explorer.exe /select, "{log_fp}"')
+        cmd = f'explorer.exe /select, "{log_fp}"'
+        LOG.debug(f"Running shell command: {cmd!r}")
+        await self.api.run_shell_cmd(cmd)
+        return ExecuteResponse()
+
+    async def reload_cache(self, path: str, firefox_fp: str) -> ExecuteResponse:
+        self.cache = self.get_bookmarks(path, firefox_fp)
+        await self.api.show_message(
+            "Firefox Keyword Bookmarks",
+            "Cache successfully reloaded",
+            "Images//app.png",
+        )
+        return ExecuteResponse(False)
+
+    async def open_url(self, firefox_fp: str | None, profile_path: str | None, url: str) -> ExecuteResponse:
+        if firefox_fp is None:
+            await self.api.open_url(url)
+        else:
+            cmd = f'cd "{firefox_fp}" && "firefox.exe" "{url}" -profile "{profile_path}"'
+            LOG.debug(f"Running shell command: {cmd!r}")
+            data = await self.api.run_shell_cmd(cmd)
+            LOG.info(f"{data.data!r}")
+        return ExecuteResponse()
+
