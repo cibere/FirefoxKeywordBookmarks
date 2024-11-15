@@ -89,7 +89,7 @@ class FirefoxKeywordBookmarks(Plugin):
 
         if self.cache is None:
             self.cache = {}
-            for path in profile_path_data.split("\\r\\n"):
+            for path in profile_path_data.split("\r\n"):
                 try:
                     self.cache.update(self.get_bookmarks(path, firefox_fp))
                 except sqlite3.OperationalError:
