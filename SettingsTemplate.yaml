@@ -2,8 +2,8 @@ body:
   - type: input
     attributes:
       name: firefox_fp
-      label: Firefox Executable Location
-      description: The location of the firefox executable to be used when opening websites. When given, FBK will open the bookmark in the profile it comes from using this exe. Leave blank to let Flow Launcher pick where to open it.
+      label: Firefox Folder Location
+      description: The folder that contains the firefox executable to be used when opening websites. When given, FKB will open the bookmark in the profile it comes from using the exe from this folder. Leave blank to let Flow Launcher pick where to open it.
   - type: textarea
     attributes:
       name: profile_path_data

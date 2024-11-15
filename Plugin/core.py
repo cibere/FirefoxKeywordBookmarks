@@ -12,6 +12,7 @@ from flowpy import (
     Plugin,
     Query,
     QueryResponse,
+    SettingNotFound,
     Settings,
 )
 
@@ -23,7 +24,9 @@ class FirefoxKeywordBookmarks(Plugin):
         self.cache: dict[str, Option] | None = None
         super().__init__()
 
-    def get_bookmarks(self, profile_path: str, firefox_fp: str) -> dict[str, Option]:
+    def get_bookmarks(
+        self, profile_path: str, firefox_fp: str | None
+    ) -> dict[str, Option]:
         LOG.info(f"Getting bookmarks for {profile_path}")
         final: dict[str, Option] = {}
 
@@ -66,25 +69,21 @@ class FirefoxKeywordBookmarks(Plugin):
         query = data.text
         LOG.info(f"Received query: {query!r}")
 
-        profile_path_data = settings.profile_path_data.strip().strip('"')
+        try:
+            profile_path_data = settings.profile_path_data
+        except SettingNotFound:
+            profile_path_data = None
+        try:
+            firefox_fp = settings.firefox_fp
+        except SettingNotFound:
+            firefox_fp = None
+
         if not profile_path_data:
             return [
                 Option(
                     title="Error: No profile data path given",
                     sub="Open context menu for more options",
-                    context_data=[
-                        Option(
-                            title="Open Settings Menu",
-                            action=Action(self.api.open_settings_menu),
-                        ),
-                        Option(
-                            title="Open Guide",
-                            action=Action(
-                                self.api.open_url,
-                                "https://github.com/cibere/Flow.Launcher.Plugin.FirefoxKeywordBookmarks?tab=readme-ov-file#how-to-get-profile-data-path",
-                            ),
-                        ),
-                    ],
+                    context_data=["NO_PROFILE_DATA_PATH_ERROR"],
                 )
             ]
 
@@ -92,13 +91,14 @@ class FirefoxKeywordBookmarks(Plugin):
             self.cache = {}
             for path in profile_path_data.split("\\r\\n"):
                 try:
-                    self.cache.update(self.get_bookmarks(path, settings.firefox_fp))
+                    self.cache.update(self.get_bookmarks(path, firefox_fp))
                 except sqlite3.OperationalError:
+                    self.cache = None
                     return [
                         Option(
                             f"Error: Unable to open profile database file. Profile: {path}",
                             sub="Are you sure the profile exists and is correct? Click this to open settings menu.",
-                            action=Action(self.api.open_settings_menu),
+                            action=Action(self.api.open_settings_menu),icon="Images/app.png"
                         )
                     ]
             LOG.info(f"Cache has been reloaded. {self.cache!r}")
@@ -110,6 +110,22 @@ class FirefoxKeywordBookmarks(Plugin):
 
     async def context_menu(self, data: list[Any]):
         LOG.debug(f"Context menu received: {data=}")
+        if data and data[0] == "NO_PROFILE_DATA_PATH_ERROR":
+            return QueryResponse(
+                [
+                    Option(
+                        title="Open Settings Menu",
+                        action=Action(self.api.open_settings_menu),
+                    ),
+                    Option(
+                        title="Open Guide",
+                        action=Action(
+                            self.api.open_url,
+                            "https://github.com/cibere/Flow.Launcher.Plugin.FirefoxKeywordBookmarks?tab=readme-ov-file#how-to-get-profile-data-path",
+                        ),
+                    ),
+                ]
+            )
         profile_path, firefox_fp, copy_options = data
         opts = []
         if copy_options:
