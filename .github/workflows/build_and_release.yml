@@ -11,17 +11,17 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     env:
-      python_ver: 3.11
+      python_ver: 3.12
     permissions:
       contents: write
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ env.python_ver }}
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ env.python_ver }}
     
       - name: Run generator file
         run: python generate_plugin_file.py
