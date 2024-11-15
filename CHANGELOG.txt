@@ -1,2 +1,12 @@
-# v0.0.3
-- Fix keywords that don't start with a colon not working
+# v0.1.0
+
+- Rewrote backend to use flow.py & the v2 plugin api
+    - This change makes it 3 times faster. (Average response time with the v1 api was 3.471699994406663ms, while with the v2 api its 1.091800004360266ms)
+- Moved the cache system from a persistent file to memory.
+- Added the ability to get bookmarks of multiple Profiles
+- Added a prefix system to help differentiate between profile bookmarks
+- Removed the `:!RELOAD_FKB` command to reload the cache
+    - Added the ability to reload the cache through the `Reload Plugin Data` command and the `F5` key.
+    - Added an option to the context menu to reload the cache
+- Add a `Open log file` option to the default context menu
+    - Fix the open log file function trying to find the wrong file

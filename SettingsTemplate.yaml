@@ -1,12 +1,11 @@
 body:
   - type: input
     attributes:
-      name: profile_path
-      label: Profile Data Path
-      description: The root path for the profile that you want to use from `about:profiles`.
-  - type: checkbox
+      name: firefox_fp
+      label: Firefox Executable Location
+      description: The location of the firefox executable to be used when opening websites. When given, FBK will open the bookmark in the profile it comes from using this exe. Leave blank to let Flow Launcher pick where to open it.
+  - type: textarea
     attributes:
-      name: use_cache
-      label: Use Cache System
-      description: If checked, FirefoxKeywordBookmarks will grab all of your bookmarks, and put them in a cache file for easy and faster access (the cache system is about 2x the speed). To reload the cache, use the `:!RELOAD_FKB` command.
-      defaultValue: True
+      name: profile_path_data
+      label: Profile Data Path
+      description: Go to `about:profiles` in firefox, and put the `root path` value for each profile you want to get the bookmarks on, on its own line.

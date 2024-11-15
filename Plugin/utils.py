@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import logging.handlers
 
@@ -16,7 +18,7 @@ def setup_logging() -> None:
         "[{asctime}] [{levelname:<8}] {name}: {message}", dt_fmt, style="{"
     )
 
-    logger = logging.getLogger()
+    logger = logging.getLogger("plugin")
     handler.setFormatter(formatter)
     logger.setLevel(level)
     logger.addHandler(handler)
