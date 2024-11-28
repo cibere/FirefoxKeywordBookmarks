@@ -18,11 +18,6 @@ async def search_handler(data: Query):
     query = data.text
     log.info(f"Received query: {query!r}")
 
-    cached_res = plugin.search_cache.get(query)
-    if cached_res:
-        log.info(f"Returning from cache: {cached_res}")
-        return cached_res
-
     profile_path_data = plugin.profile_path_data
 
     if not profile_path_data:
@@ -35,7 +30,6 @@ async def search_handler(data: Query):
     if plugin.cache is None:
         log.info(f"Reloading cache")
         plugin.cache = {}
-        plugin.search_cache.clear()
         for path in profile_path_data:
             try:
                 plugin.cache.update(plugin.get_bookmarks(path))
@@ -44,12 +38,6 @@ async def search_handler(data: Query):
                 return InvalidProfilePathResult(path)
 
         log.info(f"Cache has been reloaded. {plugin.cache!r}")
-
-    mark = plugin.cache.get(query)
+    
     log.info(f"Finished in {(time.perf_counter() - now)*1000}ms")
-    if mark:
-        res = [mark]
-    else:
-        res = []
-    plugin.search_cache[data.text] = res
-    return res
+    return plugin.cache.get(query, [])

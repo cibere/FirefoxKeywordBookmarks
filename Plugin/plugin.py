@@ -15,7 +15,6 @@ LOG = getLogger("plugin")
 class FirefoxKeywordBookmarks(Plugin):
     def __init__(self) -> None:
         self.cache: dict[str, Bookmark] | None = None
-        self.search_cache: dict[str, Any] = {}
         super().__init__()
 
     @property
@@ -72,7 +71,6 @@ class FirefoxKeywordBookmarks(Plugin):
                 except sqlite3.OperationalError:
                     await self.api.show_error_message(f"Firefox Keyword Bookmarks", f"Invalid Profile Data Path(s) given, run a new query for more information.")
                     self.cache = None
-                    self.search_cache.clear()
                     return ExecuteResponse(False)
                 
         await self.api.show_notification(
