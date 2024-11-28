@@ -1,2 +1,2 @@
-flogin==0.0.3
+git+https://github.com/cibere/flogin@7f71265795320a61ec1e168a74d241e5971ed70a
 pyperclip==1.9.0
