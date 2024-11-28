@@ -1,4 +1,4 @@
 black
 isort
-git+https://github.com/cibere/flow.py@d752de335ea0ff17abd9b2fbbc4b92373b4bd233
+flogin==0.0.3
 pyperclip

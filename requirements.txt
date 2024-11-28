@@ -1,2 +1,2 @@
-git+https://github.com/cibere/flow.py
+flogin==0.0.3
 pyperclip
