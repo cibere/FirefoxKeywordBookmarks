@@ -1,4 +1,4 @@
-black
-isort
-git+https://github.com/cibere/flow.py@d752de335ea0ff17abd9b2fbbc4b92373b4bd233
-pyperclip
+black==24.10.0
+git+https://github.com/cibere/flogin@7f71265795320a61ec1e168a74d241e5971ed70a
+pyperclip==1.9.0
+isort==5.13.2
