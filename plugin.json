@@ -4,7 +4,7 @@
     "Name": "Dev - Firefox Keyword Bookmarks",
     "Description": "A plugin that lets you open firefox bookmarks from their keyword",
     "Author": "cibere",
-    "Version": "0.2.0",
+    "Version": "0.2.1",
     "Language": "python_v2",
     "Website": "https://github.com/cibere/Flow.Launcher.Plugin.FirefoxKeywordBookmarks",
     "IcoPath": "Images\\app.png",

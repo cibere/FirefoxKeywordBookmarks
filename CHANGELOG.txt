@@ -1,6 +1,1 @@
-# v0.2.0
-
-- Support flow's embedded python version (3.11)
-- Improve error results
-- Fix open log file result callback
-- Refactor and rewrote a good portion of the backend
+# v0.2.1
