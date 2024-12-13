@@ -1,9 +1,8 @@
 import logging
 import sqlite3
 import time
-from typing import Any
 
-from flogin import Query, Result
+from flogin import Query
 
 from .plugin import FirefoxKeywordBookmarks
 from .results import InvalidProfilePathResult, NoProfilePathResult

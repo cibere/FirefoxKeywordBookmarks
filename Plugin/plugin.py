@@ -1,8 +1,6 @@
 import os
 import sqlite3
-import time
 from logging import getLogger
-from typing import Any
 
 import pyperclip
 from flogin import ExecuteResponse, Plugin, SettingNotFound

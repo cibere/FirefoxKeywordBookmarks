@@ -1,6 +1,4 @@
-# v0.2.0
+# v0.2.1
 
-- Support flow's embedded python version (3.11)
-- Improve error results
-- Fix open log file result callback
-- Refactor and rewrote a good portion of the backend
+- Update to dev version of flogin
+    - Fix bug where ghost processes use high amounts of CPU due to an improper shutdown
