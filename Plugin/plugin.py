@@ -3,7 +3,7 @@ import sqlite3
 from logging import getLogger
 
 import pyperclip
-from flogin import ExecuteResponse, Plugin, SettingNotFound
+from flogin import ExecuteResponse, Plugin
 
 from .bookmark import Bookmark
 
@@ -17,17 +17,11 @@ class FirefoxKeywordBookmarks(Plugin):
 
     @property
     def profile_path_data(self) -> list[str] | None:
-        try:
-            return self.settings.profile_path_data.split("\r\n")
-        except SettingNotFound:
-            return
+        return self.settings.profile_path_data.split("\r\n")
 
     @property
     def firefox_fp(self) -> str | None:
-        try:
-            return self.settings.firefox_fp
-        except SettingNotFound:
-            return
+        return self.settings.firefox_fp
 
     def get_bookmarks(self, profile_path: str) -> dict[str, Bookmark]:
         LOG.info(f"Getting bookmarks for {profile_path}")
