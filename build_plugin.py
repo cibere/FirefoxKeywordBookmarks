@@ -18,13 +18,11 @@ def main(archive_name: str):
     ]
     files.append(prod_file)
     ignore_exts = (".dist-info", ".pyc", "__pycache__")
-    plugin_include_exts = ("py",)
 
     files.extend(Path("assets").iterdir())
 
     plugin_dir = Path("plugin")
-    for ext in plugin_include_exts:
-        files.extend(plugin_dir.rglob(f"*.{ext}"))
+    files.extend(plugin_dir.rglob("*.py"))
 
     lib_dir = Path("lib")
     files.extend(
