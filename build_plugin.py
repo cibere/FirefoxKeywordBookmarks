@@ -20,9 +20,7 @@ def main(archive_name: str):
     ignore_exts = (".dist-info", ".pyc", "__pycache__")
 
     files.extend(Path("assets").iterdir())
-
-    plugin_dir = Path("plugin")
-    files.extend(plugin_dir.rglob("*.py"))
+    files.extend(Path("plugin").iterdir())
 
     lib_dir = Path("lib")
     files.extend(
