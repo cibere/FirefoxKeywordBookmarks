@@ -3,6 +3,7 @@ exclude = [
     ".venv",
     "test.py",
     "lib",
+    "main.py"
 ]
 
 [tool.ruff.lint]
