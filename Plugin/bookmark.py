@@ -9,14 +9,12 @@ from flogin import Result
 from flogin.jsonrpc.responses import ExecuteResponse
 
 if TYPE_CHECKING:
-    from .plugin import FirefoxKeywordBookmarks
+    from .plugin import FirefoxKeywordBookmarks  # noqa: F401
 
 log = logging.getLogger(__name__)
 
 
-class Bookmark(Result):
-    plugin: FirefoxKeywordBookmarks  # type: ignore
-
+class Bookmark(Result["FirefoxKeywordBookmarks"]):
     def __init__(
         self,
         *,
@@ -43,6 +41,8 @@ class Bookmark(Result):
         return ExecuteResponse()
 
     async def context_menu(self):
+        assert self.plugin
+
         return [
             Result.create_with_partial(
                 partial(self.plugin.copy_text, self.keyword),
