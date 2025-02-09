@@ -24,7 +24,7 @@ class Bookmark(Result):
         url: str,
         profile_path: str,
     ) -> None:
-        super().__init__(title=keyword, sub=url, icon="Images/app.png", copy_text=url)
+        super().__init__(title=keyword, sub=url, icon="assets/app.png", copy_text=url)
         self.profile_fp = profile_path
         self.keyword = keyword
         self.url = url
@@ -38,22 +38,26 @@ class Bookmark(Result):
             await self.plugin.api.open_url(self.url)
         else:
             cmd = f'cd "{firefox_fp}" && "firefox.exe" "{self.url}" -profile "{self.profile_fp}"'
-            log.debug(f"Running shell command: {cmd!r}")
+            log.debug("Running shell command: %r", cmd)
             await self.plugin.api.run_shell_cmd(cmd)
         return ExecuteResponse()
 
     async def context_menu(self):
         return [
             Result.create_with_partial(
-                partial(self.plugin.copy_text, self.keyword), title="Copy Keyword", icon="Images/app.png"
+                partial(self.plugin.copy_text, self.keyword),
+                title="Copy Keyword",
+                icon="assets/app.png",
             ),
             Result.create_with_partial(
-                partial(self.plugin.copy_text, self.url), title="Copy URL", icon="Images/app.png"
+                partial(self.plugin.copy_text, self.url),
+                title="Copy URL",
+                icon="assets/app.png",
             ),
             Result.create_with_partial(
                 partial(self.plugin.reload_cache),
-                title=f"Reload Cache",
-                icon="Images/app.png",
+                title="Reload Cache",
+                icon="assets/app.png",
             ),
             Result.create_with_partial(
                 partial(
@@ -63,6 +67,6 @@ class Bookmark(Result):
                 ),
                 title="Open Log File",
                 sub="Open FirefoxKeywordBookmarks.log in explorer",
-                icon="Images/app.png",
+                icon="assets/app.png",
             ),
         ]

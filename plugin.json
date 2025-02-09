@@ -1,12 +1,12 @@
 {
-    "ID": "f58252df-0b9f-4918-afb7-4c213a2ab06b",
-    "ActionKeyword": "fb",
-    "Name": "Dev - Firefox Keyword Bookmarks",
+    "ID": "28ff3a2e-7b21-4cd8-aeb8-3df34985c903",
+    "ActionKeyword": "*",
+    "Name": "Firefox Keyword Bookmarks",
     "Description": "A plugin that lets you open firefox bookmarks from their keyword",
     "Author": "cibere",
-    "Version": "0.2.2",
+    "Version": "0.2.3",
     "Language": "python_v2",
-    "Website": "https://github.com/cibere/Flow.Launcher.Plugin.FirefoxKeywordBookmarks",
-    "IcoPath": "Images\\app.png",
+    "Website": "https://github.com/cibere/Flow.Launcher.Plugin.FirefoxKeywordBookmarks/tree/v0.2.2",
+    "IcoPath": "assets\\app.png",
     "ExecuteFileName": "main.py"
 }

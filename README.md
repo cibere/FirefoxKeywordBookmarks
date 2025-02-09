@@ -9,7 +9,7 @@ When adding bookmarks from multiple profiles, you may get to the point where you
 ## Configuration
 1. Head to the plugin settings menu, and leave it open
 
-![Settings menu example](Images/settings_example.png)
+![Settings menu example](assets/settings_example.png)
 
 2. Get the root paths of the profile(s) that you want to use.
 
@@ -17,7 +17,7 @@ See the [how to get profile data path section](#how-to-get-profile-data-path) fo
 
 3. Go back to the plugin settings menu, and paste in each path onto its own line
 
-![Example](Images/profile_data_setting_example.png)
+![Example](assets/profile_data_setting_example.png)
 
 4. [OPTIONAL] find your firefox folder and put it in the `Firefox Executable Location` box
 
@@ -29,20 +29,20 @@ If you've set the plugin keyword to something other than `*` (the default is `*`
 
 ## Useage
 Start typing the keyword in the flow launcher menu, and after some time, it will appear.
-![Example Image](Images/example.png)
+![Example Image](assets/example.png)
 
 ## How to get profile data path
 1. Head to `about:profiles` in firefox.
 2. Find the profile that has the bookmarks that you want to use.
 3. Copy the root path.
-![](Images/find_path_example.png)
+![](assets/find_path_example.png)
 4. Paste it into the settings menu
 
 ## How to find your firefox executable's folder
 1. Search "Firefox" in the `Programs` plugin
 2. Open up the context menu and press `Open Target Folder`
-![](Images/program_plugin_ctx_menu.png)
+![](assets/program_plugin_ctx_menu.png)
 3. Click on the address bar and copy the path
-![](Images/find_target_url_example.png)
+![](assets/find_target_url_example.png)
 4. Go into your plugin settings and paste it into the `Firefox Executable Location` box
-![](Images/firefox_executable_location_setting_example.png)
+![](assets/firefox_executable_location_setting_example.png)
