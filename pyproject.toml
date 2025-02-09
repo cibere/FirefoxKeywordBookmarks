@@ -3,7 +3,6 @@ exclude = [
     ".venv",
     "test.py",
     "lib",
-    "main.py"
 ]
 
 [tool.ruff.lint]
@@ -47,6 +46,6 @@ line-ending = "auto"
 
 [tool.pyright]
 include = [
-    "plugin","build_plugin.py", "main.py"
+    "plugin","build_plugin.py",
 ]
 pythonPlatform = "Windows"
