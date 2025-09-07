@@ -50,18 +50,6 @@ body:
       description: Use the `Flow Launcher UserData Folder` command with the `System Commands` plugin to open your userdata folder, go into the `Plugins` folder, then find the plugin and go into it. If the `flogin.log` file exists, upload it here. Otherwise please state that it was not there.
     validations:
       required: true
-  - type: checkboxes
-    attributes:
-      label: Checklist
-      description: >
-        Let's make sure you've properly done due diligence when reporting this issue!
-      options:
-        - label: I have searched the open issues for duplicates.
-          required: true
-        - label: I have shown the entire traceback, if possible.
-          required: true
-        - label: I have removed my token from display, if visible.
-          required: true
   - type: textarea
     attributes:
       label: Additional Context

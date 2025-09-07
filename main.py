@@ -6,7 +6,6 @@ sys.path.extend(
     str(path) for path in (root / "lib", root / ".venv" / "lib" / "site-packages", root)
 )
 
-from plugin.core import plugin  # noqa: E402
+from firefoxkeywordbookmarks.core import plugin  # noqa: E402
 
-if __name__ == "__main__":
-    plugin.run()
+plugin.run()

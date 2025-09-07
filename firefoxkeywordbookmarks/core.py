@@ -2,7 +2,7 @@ import logging
 import sqlite3
 import time
 
-from flogin import Query
+from flogin import Query, Result
 
 from .plugin import FirefoxKeywordBookmarks
 from .results import InvalidProfilePathResult, NoProfilePathResult
@@ -13,7 +13,7 @@ plugin = FirefoxKeywordBookmarks()
 
 
 @plugin.search()
-async def search_handler(data: Query):
+async def search_handler(data: Query) -> Result | list[Result]:
     now = time.perf_counter()
     query = data.text
 

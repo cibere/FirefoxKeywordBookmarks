@@ -11,12 +11,12 @@ class NoProfilePathResult(Result):
             icon="assets/error.png",
         )
 
-    async def callback(self):
+    async def callback(self) -> None:
         assert self.plugin
 
         await self.plugin.api.open_settings_menu()
 
-    async def context_menu(self):
+    async def context_menu(self) -> list[Result]:
         assert self.plugin
 
         return [
@@ -44,12 +44,12 @@ class InvalidProfilePathResult(Result):
             icon="assets/error.png",
         )
 
-    async def callback(self):
+    async def callback(self) -> None:
         assert self.plugin
 
         await self.plugin.api.open_settings_menu()
 
-    async def context_menu(self):
+    async def context_menu(self) -> list[Result]:
         assert self.plugin
 
         return [
